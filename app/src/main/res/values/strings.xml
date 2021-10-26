@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GeolocTest</string>
+    <string name="current_gps_location">Current GPS Location</string>
+    <string name="get_location">Get location</string>
 </resources>
