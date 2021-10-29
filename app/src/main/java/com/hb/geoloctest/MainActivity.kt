@@ -13,6 +13,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.hb.geoloctest.dao.CoordinateDAO
+import com.hb.geoloctest.database.AppDatabase
+import com.hb.geoloctest.models.Coordinate
 
 class MainActivity : AppCompatActivity(), LocationListener {
 
@@ -20,9 +23,13 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private lateinit var tvGpsLocation: TextView
     private val locationPermissionCode = 2
 
+    private val db by lazy { AppDatabase.getDatabase(this) }
+    private val coordinateDao = db.coordinateDao()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         val button: Button = findViewById(R.id.getLocation)
         button.setOnClickListener {
@@ -41,6 +48,9 @@ class MainActivity : AppCompatActivity(), LocationListener {
     override fun onLocationChanged(location: Location) {
         tvGpsLocation = findViewById(R.id.textView)
         tvGpsLocation.text = "Latitude: " + location.latitude + "\nLongitude: " + location.longitude
+
+        val coordinate = Coordinate(null, location.latitude, location.longitude)
+        coordinateDao.insertAll(coordinate)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
