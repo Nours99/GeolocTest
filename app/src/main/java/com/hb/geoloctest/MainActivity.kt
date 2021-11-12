@@ -7,15 +7,20 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.hb.geoloctest.dao.CoordinateDAO
 import com.hb.geoloctest.database.AppDatabase
 import com.hb.geoloctest.models.Coordinate
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity(), LocationListener {
 
@@ -24,17 +29,26 @@ class MainActivity : AppCompatActivity(), LocationListener {
     private val locationPermissionCode = 2
 
     private val db by lazy { AppDatabase.getDatabase(this) }
-    private val coordinateDao = db.coordinateDao()
+    private lateinit var coordinateDao :CoordinateDAO
+
+    private var latitude : Double? = null
+    private var longitude : Double? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        coordinateDao = db.coordinateDao()
 
         val button: Button = findViewById(R.id.getLocation)
         button.setOnClickListener {
             getLocation()
+            GlobalScope.launch { insert() }
         }
+    }
+
+    suspend fun insert(){
+        val coordinate = Coordinate(null, latitude, longitude)
+        coordinateDao.insertAll(coordinate)
     }
 
     private fun getLocation() {
@@ -46,11 +60,11 @@ class MainActivity : AppCompatActivity(), LocationListener {
     }
 
     override fun onLocationChanged(location: Location) {
-        tvGpsLocation = findViewById(R.id.textView)
-        tvGpsLocation.text = "Latitude: " + location.latitude + "\nLongitude: " + location.longitude
+        latitude = location.latitude
+        longitude = location.longitude
 
-        val coordinate = Coordinate(null, location.latitude, location.longitude)
-        coordinateDao.insertAll(coordinate)
+        tvGpsLocation = findViewById(R.id.textView)
+        tvGpsLocation.text = "Latitude: " + latitude + "\nLongitude: " + longitude
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

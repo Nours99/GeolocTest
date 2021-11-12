@@ -12,7 +12,7 @@ interface CoordinateDAO {
     suspend fun loadAllByIds(coodinateIds: LongArray): List<Coordinate>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg coordinates: Coordinate)
+    suspend fun insertAll(vararg coordinates: Coordinate)
 
     @Delete
     fun delete(coordinate: Coordinate)
