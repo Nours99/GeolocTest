@@ -12,7 +12,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Composable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.hb.geoloctest.dao.CoordinateDAO
@@ -20,7 +19,6 @@ import com.hb.geoloctest.database.AppDatabase
 import com.hb.geoloctest.models.Coordinate
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity(), LocationListener {
 
@@ -46,9 +44,12 @@ class MainActivity : AppCompatActivity(), LocationListener {
         }
     }
 
-    suspend fun insert(){
+    private suspend fun insert(){
         val coordinate = Coordinate(null, latitude, longitude)
         coordinateDao.insertAll(coordinate)
+        coordinateDao.getAll().forEach {
+            Log.d("log db", it.toString())
+        }
     }
 
     private fun getLocation() {
